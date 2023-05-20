@@ -184,7 +184,14 @@ class PackageTable extends StatelessWidget {
               future: e.latest,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Text(snapshot.data ?? "?");
+                  final value = snapshot.data ?? "?";
+                  return Text(
+                    value,
+                    style: value == e.lockVersion
+                        ? null
+                        : const TextStyle(
+                            color: Colors.red, fontWeight: FontWeight.bold),
+                  );
                 } else {
                   return const SizedBox(
                       width: 24,
