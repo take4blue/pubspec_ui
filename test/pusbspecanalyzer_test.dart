@@ -104,21 +104,21 @@ void main() {
       target.handle(yaml);
       expect(target.packages.isEmpty, true);
     });
-
-    test("key value", () {
-      String file = """dependencies:
+    group("dependencies", () {
+      test("key value", () {
+        String file = """dependencies:
   meta: ^1.8.0
 """;
 
-      final yaml = loadYamlNode(file);
-      final target = PubspecAnalizer();
-      target.handle(yaml);
-      expect(target.packages.length, 1);
-      expect(target.packages[0].name, "meta");
-      expect(target.packages[0].version, "^1.8.0");
-    });
-    test("multiple data", () {
-      String file = """name: hoge
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 1);
+        expect(target.packages[0].name, "meta");
+        expect(target.packages[0].version, "^1.8.0");
+      });
+      test("multiple data", () {
+        String file = """name: hoge
 
 environment:
   sdk: '>=2.17.0 <3.0.0'
@@ -129,54 +129,54 @@ dependencies:
   yaml: ^3.1.0
 """;
 
-      final yaml = loadYamlNode(file);
-      final target = PubspecAnalizer();
-      target.handle(yaml);
-      expect(target.packages.length, 3);
-      expect(target.packages[0].name, "meta");
-      expect(target.packages[0].version, "^1.8.0");
-      expect(target.packages[1].name, "csv");
-      expect(target.packages[1].version, "^5.0.0");
-      expect(target.packages[2].name, "yaml");
-      expect(target.packages[2].version, "^3.1.0");
-    });
-    test("key version", () {
-      String file = """dependencies:
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 3);
+        expect(target.packages[0].name, "meta");
+        expect(target.packages[0].version, "^1.8.0");
+        expect(target.packages[1].name, "csv");
+        expect(target.packages[1].version, "^5.0.0");
+        expect(target.packages[2].name, "yaml");
+        expect(target.packages[2].version, "^3.1.0");
+      });
+      test("key version", () {
+        String file = """dependencies:
   excel:
     git: https://github.com/take4blue/excel
     version: ^1.4.0
 """;
 
-      final yaml = loadYamlNode(file);
-      final target = PubspecAnalizer();
-      target.handle(yaml);
-      expect(target.packages.length, 1);
-      expect(target.packages[0].name, "excel");
-      expect(target.packages[0].version, "^1.4.0");
-    });
-    test("no data1", () {
-      String file = """dependencies:
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 1);
+        expect(target.packages[0].name, "excel");
+        expect(target.packages[0].version, "^1.4.0");
+      });
+      test("no data1", () {
+        String file = """dependencies:
 """;
 
-      final yaml = loadYamlNode(file);
-      final target = PubspecAnalizer();
-      target.handle(yaml);
-      expect(target.packages.isEmpty, true);
-    });
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.isEmpty, true);
+      });
 
-    test("no data2", () {
-      String file = """dev_dependencies:
+      test("no data2", () {
+        String file = """dev_dependencies:
   test: ^1.20.0
   lints: ^2.0.1
 """;
 
-      final yaml = loadYamlNode(file);
-      final target = PubspecAnalizer();
-      target.handle(yaml);
-      expect(target.packages.isEmpty, true);
-    });
-    test("no data3", () {
-      String file = """name: hoge
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.isEmpty, true);
+      });
+      test("no data3", () {
+        String file = """name: hoge
 
 environment:
   sdk: '>=2.17.0 <3.0.0'
@@ -186,10 +186,134 @@ dev_dependencies:
   lints: ^2.0.1
 """;
 
-      final yaml = loadYamlNode(file);
-      final target = PubspecAnalizer();
-      target.handle(yaml);
-      expect(target.packages.isEmpty, true);
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.isEmpty, true);
+      });
+    });
+
+    group("dependency_overrides", () {
+      test("key value", () {
+        String file = """dependency_overrides:
+  meta: ^1.8.0
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 1);
+        expect(target.packages[0].name, "meta");
+        expect(target.packages[0].version, "^1.8.0");
+      });
+      test("multiple data", () {
+        String file = """name: hoge
+
+environment:
+  sdk: '>=2.17.0 <3.0.0'
+
+dependency_overrides:
+  meta: ^1.8.0
+  csv: ^5.0.0
+  yaml: ^3.1.0
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 3);
+        expect(target.packages[0].name, "meta");
+        expect(target.packages[0].version, "^1.8.0");
+        expect(target.packages[1].name, "csv");
+        expect(target.packages[1].version, "^5.0.0");
+        expect(target.packages[2].name, "yaml");
+        expect(target.packages[2].version, "^3.1.0");
+      });
+      test("key version", () {
+        String file = """dependency_overrides:
+  excel:
+    git: https://github.com/take4blue/excel
+    version: ^1.4.0
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 1);
+        expect(target.packages[0].name, "excel");
+        expect(target.packages[0].version, "^1.4.0");
+      });
+      test("no data1", () {
+        String file = """dependency_overrides:
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.isEmpty, true);
+      });
+
+      test("no data2", () {
+        String file = """dev_dependencies:
+  test: ^1.20.0
+  lints: ^2.0.1
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.isEmpty, true);
+      });
+      test("no data3", () {
+        String file = """name: hoge
+
+environment:
+  sdk: '>=2.17.0 <3.0.0'
+
+dev_dependencies:
+  test: ^1.20.0
+  lints: ^2.0.1
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.isEmpty, true);
+      });
+    });
+
+    group("multi description", () {
+      test("override dependency", () {
+        String file = """
+dependency:
+  meta: ^1.8.0
+dependency_overrides:
+  meta: ^1.9.0
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 1);
+        expect(target.packages[0].name, "meta");
+        expect(target.packages[0].version, "^1.9.0");
+      });
+
+      test("skip dependency version", () {
+        String file = """
+dependency_overrides:
+  meta: ^1.9.0
+dependency:
+  meta: ^1.8.0
+""";
+
+        final yaml = loadYamlNode(file);
+        final target = PubspecAnalizer();
+        target.handle(yaml);
+        expect(target.packages.length, 1);
+        expect(target.packages[0].name, "meta");
+        expect(target.packages[0].version, "^1.9.0");
+      });
     });
   });
 

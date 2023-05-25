@@ -133,12 +133,27 @@ class PubspecAnalizer extends YamlNodeHandler {
 
   @override
   void handleMapValue(YamlNode value) {
-    if (stackKey.length >= 2 && stackKey[0].value == "dependencies") {
-      // dependenciesの2段目でpackagesの生成処理を行う
-      packages.add(PubspecPackage.create(stackKey[1], value));
-    } else {
-      super.handleMapValue(value);
+    if (stackKey.length >= 2) {
+      // dependencies/dependency_overridesの2段目でpackagesの生成処理を行う
+      final index =
+          packages.indexWhere((element) => element.name == stackKey[1].value);
+      switch (stackKey[0].value) {
+        case "dependencies":
+          if (index == -1) {
+            // データがない場合のみ追加処理をする
+            packages.add(PubspecPackage.create(stackKey[1], value));
+          }
+          return;
+        case "dependency_overrides":
+          // データがある場合、消去してから追加処理をする
+          if (index > -1) {
+            packages.removeAt(index);
+          }
+          packages.add(PubspecPackage.create(stackKey[1], value));
+          return;
+      }
     }
+    super.handleMapValue(value);
   }
 
   @override

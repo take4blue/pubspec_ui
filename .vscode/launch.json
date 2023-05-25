@@ -11,7 +11,7 @@
             "program": "lib/main.dart",
             "args": [
                 "--dart-define",
-                "PUBSPEC_PATH='test_resources/test1.yaml'",
+                "PUBSPEC_PATH='test_resources/test3.yaml'",
             ],
         },
     ]
