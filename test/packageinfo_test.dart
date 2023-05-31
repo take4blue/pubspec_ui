@@ -18,47 +18,6 @@ void main() {
       expect(target.link, Source.git);
       expect(target.target, "hage");
     });
-    group("uriTarget", () {
-      test("git", () {
-        const target = Package(
-            name: "excel",
-            specVersion: "3.0.0",
-            lockVersion: "3.1.0",
-            link: Source.git,
-            target: "https://github.com/take4blue/excel");
-        expect(
-            target.uriTarget.toString(), "https://github.com/take4blue/excel");
-      });
-      test("hosted", () {
-        const target = Package(
-            name: "excel",
-            specVersion: "3.0.0",
-            lockVersion: "3.1.0",
-            link: Source.hosted,
-            target: "https://pub.dev");
-        expect(target.uriTarget.toString(), "https://pub.dev/packages/excel");
-      });
-      test("path relative", () {
-        const target = Package(
-            name: "excel",
-            specVersion: "3.0.0",
-            lockVersion: "3.1.0",
-            link: Source.path,
-            target: "../library/excel");
-        expect(target.uriTarget,
-            Uri.directory(File("../library/excel/").absolute.path));
-      });
-      test("path absolute", () {
-        const target = Package(
-            name: "excel",
-            specVersion: "3.0.0",
-            lockVersion: "3.1.0",
-            link: Source.path,
-            target: "/library/excel");
-        expect(target.uriTarget,
-            Uri.directory(File("/library/excel").absolute.path));
-      });
-    });
   });
 
   group("PubspecInfo", () {
@@ -105,10 +64,11 @@ dependencies:
         expect(target.info[i].link, Source.path);
         expect(target.info[i].lockVersion, "2.0.4");
         expect(target.info[i].target, "../library/excel");
+        expect(target.yamlBody, yaml);
       });
       test('file', () {
-        final target =
-            PubspecInfo.create(filename: "test_resources/test1.yaml");
+        const filename = "test_resources/test1.yaml";
+        final target = PubspecInfo.create(filename: filename);
         expect(target.info.length, 6);
         int i = 0;
         expect(target.info[i].name, "csv");
@@ -146,6 +106,8 @@ dependencies:
         expect(target.info[i].link, Source.hosted);
         expect(target.info[i].lockVersion, "3.1.1");
         expect(target.info[i].target, "https://pub.dev");
+
+        expect(target.yamlBody, File(filename).readAsStringSync());
       });
     });
     group('exception', () {

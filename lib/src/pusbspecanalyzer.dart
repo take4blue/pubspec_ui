@@ -72,7 +72,8 @@ class PubspecMatchLock extends YamlNodeHandler {
               specVersion: pubspec[index].version,
               lockVersion: lock.version,
               link: lock.link,
-              target: lock.source));
+              target: lock.source,
+              specVersionPosition: pubspec[index].yamlVersion));
         }
         return;
       }
@@ -92,18 +93,18 @@ class PubspecPackageAnalizer extends YamlNodeHandler {
     }
   }
   String name = "";
-  String version = "";
+  YamlScalar? version;
 
   @override
   void handleScalar(YamlScalar target) {
     if (stackKey.isNotEmpty) {
       name = stackKey[0].value;
       if (stackKey.length == 1 && target.value != null) {
-        version = target.value;
+        version = target;
       }
     }
     if (stackKey.last.value == "version" && target.value != null) {
-      version = target.value;
+      version = target;
     }
   }
 }
@@ -117,13 +118,16 @@ class PubspecPackage {
     return PubspecPackage(analyzer.name, analyzer.version);
   }
 
-  const PubspecPackage(this.name, this.version);
+  const PubspecPackage(this.name, this.yamlVersion);
 
   /// パッケージ名
   final String name;
 
   /// pubspec.yaml側の要求バージョン
-  final String version;
+  String get version => yamlVersion?.value ?? "";
+
+  /// 要求バージョンが設定されているyaml情報
+  final YamlScalar? yamlVersion;
 }
 
 /// pubspec側の読み込み用</br>

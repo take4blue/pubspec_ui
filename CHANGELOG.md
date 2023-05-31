@@ -1,3 +1,8 @@
+## 1.3.0
+
+* 最新バージョンのバージョン番号をpubspec.yamlに保存できるようにした。
+* 内部的にはproviderを使ってMVVM的にして見た。
+
 ## 1.2.0
 
 * dependency_overridesを上書きで取り込むように修正。

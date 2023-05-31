@@ -11,7 +11,7 @@ void main() {
       final target = PubspecPackageAnalizer();
       target.handle(loadYamlNode(file));
       expect(target.name, "meta");
-      expect(target.version, "^1.8.0");
+      expect(target.version!.value, "^1.8.0");
     });
     test("no value", () {
       String file = """meta:""";
@@ -19,7 +19,7 @@ void main() {
       final target = PubspecPackageAnalizer();
       target.handle(loadYamlNode(file));
       expect(target.name, "meta");
-      expect(target.version, "");
+      expect(target.version, null);
     });
     test("no value no version", () {
       String file = """excel:
@@ -29,7 +29,7 @@ void main() {
       final target = PubspecPackageAnalizer();
       target.handle(loadYamlNode(file));
       expect(target.name, "excel");
-      expect(target.version, "");
+      expect(target.version, null);
     });
     test("has version tag", () {
       String file = """transmogrify:
@@ -41,14 +41,19 @@ void main() {
       final target = PubspecPackageAnalizer();
       target.handle(loadYamlNode(file));
       expect(target.name, "transmogrify");
-      expect(target.version, "^1.4.0");
+      expect(target.version!.value, "^1.4.0");
     });
   });
   group("PubspecPackage", () {
     test("construct", () {
-      const target = PubspecPackage("hoge", "hage");
+      final target = PubspecPackage("hoge", YamlScalar.wrap("hage"));
       expect(target.name, "hoge");
       expect(target.version, "hage");
+    });
+    test("null yaml", () {
+      const target = PubspecPackage("hoge", null);
+      expect(target.name, "hoge");
+      expect(target.version, "");
     });
     test("key value", () {
       String file = "meta: ^1.8.0";
@@ -285,7 +290,7 @@ dev_dependencies:
     group("multi description", () {
       test("override dependency", () {
         String file = """
-dependency:
+dependencies:
   meta: ^1.8.0
 dependency_overrides:
   meta: ^1.9.0
@@ -303,7 +308,7 @@ dependency_overrides:
         String file = """
 dependency_overrides:
   meta: ^1.9.0
-dependency:
+dependencies:
   meta: ^1.8.0
 """;
 
@@ -379,28 +384,28 @@ version: "2.0.4"
       expect(target.version, "2.0.4");
       expect(target.source, "../library/excel");
     });
-  });
-  test("sdk", () {
-    String file = '''dependency: "direct main"
+    test("sdk", () {
+      String file = '''dependency: "direct main"
 description: flutter
 source: sdk
 version: "0.0.0"
 ''';
 
-    final yaml = loadYamlNode(file);
-    final target = LockPackageAnalyzer();
-    target.handle(yaml);
-    expect(target.link, Source.sdk);
-    expect(target.version, "0.0.0");
-    expect(target.source, "");
+      final yaml = loadYamlNode(file);
+      final target = LockPackageAnalyzer();
+      target.handle(yaml);
+      expect(target.link, Source.sdk);
+      expect(target.version, "0.0.0");
+      expect(target.source, "");
+    });
   });
 
   group("PubspecMatchLock", () {
     test("no data", () {
       String file = """
 """;
-      const pubspec = <PubspecPackage>[
-        PubspecPackage("hoge", "1.0.0"),
+      final pubspec = <PubspecPackage>[
+        PubspecPackage("hoge", YamlScalar.wrap("1.0.0")),
       ];
 
       final target = PubspecMatchLock(pubspec);
@@ -419,8 +424,8 @@ version: "0.0.0"
     source: hosted
     version: "2.11.0"
 """;
-      const pubspec = <PubspecPackage>[
-        PubspecPackage("hoge", "1.0.0"),
+      final pubspec = <PubspecPackage>[
+        PubspecPackage("hoge", YamlScalar.wrap("1.0.0")),
       ];
 
       final target = PubspecMatchLock(pubspec);
@@ -439,8 +444,9 @@ version: "0.0.0"
     source: hosted
     version: "2.11.0"
 """;
-      const pubspec = <PubspecPackage>[
-        PubspecPackage("hoge", "1.0.0"),
+      final yaml = YamlScalar.wrap("1.0.0");
+      final pubspec = <PubspecPackage>[
+        PubspecPackage("hoge", yaml),
       ];
 
       final target = PubspecMatchLock(pubspec);
@@ -452,6 +458,7 @@ version: "0.0.0"
       expect(target.packages[0].link, Source.hosted);
       expect(target.packages[0].lockVersion, "2.11.0");
       expect(target.packages[0].target, "https://pub.dev");
+      expect(target.packages[0].specVersionPosition, yaml);
     });
     test("match datas", () {
       String file = """packages:
@@ -471,9 +478,9 @@ version: "0.0.0"
     source: hosted
     version: "2.11.0"
 """;
-      const pubspec = <PubspecPackage>[
-        PubspecPackage("hoge", "1.0.0"),
-        PubspecPackage("hage", "2.0.0"),
+      final pubspec = <PubspecPackage>[
+        PubspecPackage("hoge", YamlScalar.wrap("1.0.0")),
+        PubspecPackage("hage", YamlScalar.wrap("2.0.0")),
       ];
 
       final target = PubspecMatchLock(pubspec);
