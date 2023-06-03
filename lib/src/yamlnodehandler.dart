@@ -10,16 +10,20 @@ abstract class YamlNodeHandler {
 
   /// [YamlNode]の処理
   void handle(YamlNode target) {
-    if (target is YamlScalar) {
-      handleScalar(target);
-    } else if (target is YamlList) {
-      handleList(target);
-    } else if (target is YamlMap) {
-      handleMap(target);
-    } else {
-      // YamlNodeそのもの、もしくは未対応のYamlNode派生が出た場合
-      // 例外出して実装を促す。
-      throw ArgumentError();
+    switch (target) {
+      case YamlScalar():
+        handleScalar(target);
+        break;
+      case YamlList():
+        handleList(target);
+        break;
+      case YamlMap():
+        handleMap(target);
+        break;
+      default:
+        // YamlNodeそのもの、もしくは未対応のYamlNode派生が出た場合
+        // 例外出して実装を促す。
+        throw ArgumentError();
     }
   }
 
